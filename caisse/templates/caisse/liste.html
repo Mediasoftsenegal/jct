@@ -39,7 +39,10 @@
           <td class="num">{{ c.nombre_factures }}</td>
           <td class="num">{{ c.total_facture|format_money_with_currency }}</td>
           <td class="num" style="color:var(--olive-fonce);font-weight:600">{{ c.total_encaisse|format_money_with_currency }}</td>
-          <td class="num">{{ c.total_non_paye|format_money_with_currency }}</td>
+          <td class="num">
+            {% if c.est_en_surplus %}<span style="color:var(--olive-fonce);font-weight:600">Surplus : {{ c.surplus_encaisse|format_money_with_currency }}</span>
+            {% else %}{{ c.total_non_paye|format_money_with_currency }}{% endif %}
+          </td>
           <td class="text-end"><a href="{% url 'caisse:detail' c.pk %}" class="btn btn-sm btn-outline-primary">Détail</a></td>
         </tr>
         {% empty %}<tr><td colspan="6" class="text-center text-muted-2 py-4">Aucune clôture enregistrée.</td></tr>
