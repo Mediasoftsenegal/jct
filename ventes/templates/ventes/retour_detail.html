@@ -46,8 +46,8 @@
               <td class="fw-semibold">{{ l.article.libarticle }}</td>
               <td>{{ l.conditionnement.nom }}</td>
               <td class="num fw-semibold">{{ l.quantite_facturee }}</td>
-              <td class="num">{{ l.prix_unitaire|floatformat:0 }}</td>
-              <td class="num">{{ l.remise_unitaire|floatformat:0 }}</td>
+              <td class="num">{{ l.prix_unitaire|format_money_with_currency }}</td>
+              <td class="num">{{ l.remise_unitaire|format_money_with_currency }}</td>
               <td class="num">
                 {% if retour.modifiable %}
                 <input type="number" class="form-control form-control-sm num in-vendue"
@@ -56,8 +56,8 @@
                 {% else %}{{ l.quantite_vendue }}{% endif %}
               </td>
               <td class="num qte-retour" style="color:var(--terracotta)">{{ l.quantite_retournee }}</td>
-              <td class="num mt-vendu">{{ l.montant_vendu|floatformat:0 }}</td>
-              <td class="num mt-retour" style="color:var(--terracotta)">{{ l.montant_retourne|floatformat:0 }}</td>
+              <td class="num mt-vendu">{{ l.montant_vendu|format_money_with_currency }}</td>
+              <td class="num mt-retour" style="color:var(--terracotta)">{{ l.montant_retourne|format_money_with_currency }}</td>
             </tr>
             {% endfor %}
           </tbody>
@@ -68,8 +68,8 @@
               <td colspan="2"></td>
               <td class="num" id="totVendue">{{ calcul.quantite_vendue_totale }}</td>
               <td class="num" id="totRetour" style="color:var(--terracotta)">{{ calcul.quantite_retournee_totale }}</td>
-              <td class="num" id="totMtVendu">{{ calcul.montant_vendu_ht|floatformat:0 }}</td>
-              <td class="num" id="totMtRetour" style="color:var(--terracotta)">{{ calcul.montant_retourne_ht|floatformat:0 }}</td>
+              <td class="num" id="totMtVendu">{{ calcul.montant_vendu_ht|format_money_with_currency }}</td>
+              <td class="num" id="totMtRetour" style="color:var(--terracotta)">{{ calcul.montant_retourne_ht|format_money_with_currency }}</td>
             </tr>
           </tfoot>
         </table>
@@ -101,28 +101,28 @@
       </div>
       <div class="card-body border-top small">
         <div class="d-flex justify-content-between text-muted-2">
-          <span>Montant HT facturé</span><span>{{ calcul.montant_facture_ht|floatformat:0 }}</span>
+          <span>Montant HT facturé</span><span>{{ calcul.montant_facture_ht|format_money_with_currency }}</span>
         </div>
         <div class="d-flex justify-content-between" style="color:var(--terracotta)">
-          <span>Marchandise reprise (HT)</span><span id="boxMtRetour">- {{ calcul.montant_retourne_ht|floatformat:0 }}</span>
+          <span>Marchandise reprise (HT)</span><span id="boxMtRetour">- {{ calcul.montant_retourne_ht|format_money_with_currency }}</span>
         </div>
         <div class="d-flex justify-content-between text-muted-2">
-          <span>Montant HT vendu</span><span id="boxMtVendu">{{ calcul.montant_vendu_ht|floatformat:0 }}</span>
+          <span>Montant HT vendu</span><span id="boxMtVendu">{{ calcul.montant_vendu_ht|format_money_with_currency }}</span>
         </div>
         {% if retour.facture.appliquer_tva %}
         <div class="d-flex justify-content-between text-muted-2">
-          <span>TVA (18%)</span><span id="boxTva">{{ calcul.montant_vendu_tva|floatformat:0 }}</span>
+          <span>TVA (18%)</span><span id="boxTva">{{ calcul.montant_vendu_tva|format_money_with_currency }}</span>
         </div>
         {% endif %}
         <div class="d-flex justify-content-between align-items-center mt-2">
           <span class="fw-semibold">Net à payer</span>
-          <span class="h4 mb-0" style="font-family:Poppins" id="boxTotal">{{ calcul.montant_vendu_ttc|floatformat:0 }}</span>
+          <span class="h4 mb-0" style="font-family:Poppins" id="boxTotal">{{ calcul.montant_vendu_ttc|format_money_with_currency }}</span>
         </div>
         <div class="d-flex justify-content-between text-muted-2 mt-1">
-          <span>Déjà payé</span><span>{{ calcul.deja_paye|floatformat:0 }}</span>
+          <span>Déjà payé</span><span>{{ calcul.deja_paye|format_money_with_currency }}</span>
         </div>
         <div class="d-flex justify-content-between fw-semibold" style="color:var(--terracotta)">
-          <span>Reste à payer</span><span id="boxReste">{{ calcul.reste_a_payer|floatformat:0 }}</span>
+          <span>Reste à payer</span><span id="boxReste">{{ calcul.reste_a_payer|format_money_with_currency }}</span>
         </div>
         {% if retour.statut == 'VALIDEE' %}
         <div class="text-muted-2 fst-italic mt-2">Arrêtée à la somme de : {{ retour.montant_en_lettres }}.</div>

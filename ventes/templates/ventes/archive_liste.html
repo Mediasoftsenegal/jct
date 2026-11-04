@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load monnaie %}
 {% block title %}Archives des commandes{% endblock %}
 {% block page_title %}Archives des commandes (2013-2023){% endblock %}
 {% block topbar_actions %}
@@ -37,7 +38,7 @@
         <td class="fw-semibold">{{ c.reference }}</td>
         <td>{{ c.date|date:"d/m/Y" }}</td>
         <td>{{ c.client.nom|default:"—" }}</td>
-        <td class="num">{{ c.montant|floatformat:0 }}</td>
+        <td class="num">{{ c.montant|format_money_with_currency }}</td>
         <td>{{ c.etat|default:"—" }}</td>
         <td class="text-end"><a href="{% url 'ventes:archive_detail' c.pk %}" class="btn btn-sm btn-outline-primary">Ouvrir</a></td>
       </tr>

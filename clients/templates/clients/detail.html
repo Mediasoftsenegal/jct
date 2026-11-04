@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load monnaie %}
 {% block title %}{{ client.nom }}{% endblock %}
 {% block page_title %}Fiche client{% endblock %}
 
@@ -39,8 +40,8 @@
             <tr>
               <td><a href="{% url 'ventes:facture_detail' f.pk %}" class="text-decoration-none">{{ f.numero }}</a></td>
               <td>{{ f.date|date:"d/m/Y" }}</td>
-              <td class="num">{{ f.montant_total|floatformat:0 }}</td>
-              <td class="num">{{ f.reliquat|floatformat:0 }}</td>
+              <td class="num">{{ f.montant_total|format_money_with_currency }}</td>
+              <td class="num">{{ f.reliquat|format_money_with_currency }}</td>
               <td>{% if f.annulee %}<span class="badge-soft badge-danger">Annulée</span>
                   {% else %}<span class="badge-soft badge-neutre">{{ f.statut_paiement.label }}</span>{% endif %}</td>
             </tr>

@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load monnaie %}
 {% block title %}Archives des factures{% endblock %}
 {% block page_title %}Archives des factures{% endblock %}
 {% block topbar_actions %}
@@ -37,7 +38,7 @@
         <td class="fw-semibold">{{ f.reference }}</td>
         <td>{{ f.date|date:"d/m/Y" }}</td>
         <td>{{ f.client.nom|default:f.nom_client|default:"—" }}</td>
-        <td class="num">{{ f.montant|floatformat:0 }}</td>
+        <td class="num">{{ f.montant|format_money_with_currency }}</td>
         <td>{{ f.modalite|default:"—" }}</td>
         <td class="text-end"><a href="{% url 'ventes:archive_facture_detail' f.pk %}" class="btn btn-sm btn-outline-primary">Ouvrir</a></td>
       </tr>

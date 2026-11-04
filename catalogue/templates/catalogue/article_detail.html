@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load monnaie %}
 {% block title %}{{ article.designation }}{% endblock %}
 {% block page_title %}Article{% endblock %}
 
@@ -17,7 +18,7 @@
           <dt class="col-5 text-muted-2">Type</dt><dd class="col-7">{{ article.type_article.nom }}</dd>
           <dt class="col-5 text-muted-2">Unité de base</dt><dd class="col-7">{{ article.unite_base }}</dd>
           <dt class="col-5 text-muted-2">Seuil d'alerte</dt><dd class="col-7">{{ article.seuil_alerte }}</dd>
-          <dt class="col-5 text-muted-2">Prix d'achat</dt><dd class="col-7">{{ article.prix_achat|floatformat:0 }} / unité</dd>
+          <dt class="col-5 text-muted-2">Prix d'achat</dt><dd class="col-7">{{ article.prix_achat|format_money_with_currency }} / unité</dd>
           <dt class="col-5 text-muted-2">Conditionnements</dt>
           <dd class="col-7">{% for c in article.conditionnements.all %}<span class="badge-soft badge-neutre me-1">{{ c.nom }}</span>{% empty %}—{% endfor %}</dd>
         </dl>
@@ -30,7 +31,7 @@
           <thead><tr><th>Liste</th><th>Conditionnement</th><th class="num">Prix</th></tr></thead>
           <tbody>
             {% for t in tarifs %}
-            <tr><td>{{ t.liste_tarif.nom }}</td><td>{{ t.conditionnement.nom }}</td><td class="num">{{ t.prix_unitaire|floatformat:0 }}</td></tr>
+            <tr><td>{{ t.liste_tarif.nom }}</td><td>{{ t.conditionnement.nom }}</td><td class="num">{{ t.prix_unitaire|format_money_with_currency }}</td></tr>
             {% empty %}<tr><td colspan="3" class="text-center text-muted-2 py-3">Aucun tarif défini.</td></tr>
             {% endfor %}
           </tbody>

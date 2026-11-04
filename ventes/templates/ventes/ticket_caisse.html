@@ -1,3 +1,4 @@
+{% load monnaie %}
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -43,20 +44,20 @@
       <tr>
         <td></td>
         <td class="num">{{ l.quantite }}</td>
-        <td class="num">{{ l.prix_unitaire|floatformat:0 }}</td>
-        <td class="num">{{ l.montant|floatformat:0 }}</td>
+        <td class="num">{{ l.prix_unitaire|format_money_with_currency }}</td>
+        <td class="num">{{ l.montant|format_money_with_currency }}</td>
       </tr>
       {% if l.montant_remise %}
-      <tr><td colspan="3">dont remise ({{ l.remise_unitaire|floatformat:0 }} x {{ l.quantite }})</td>
-        <td class="num">- {{ l.montant_remise|floatformat:0 }}</td></tr>
+      <tr><td colspan="3">dont remise ({{ l.remise_unitaire|format_money_with_currency }} x {{ l.quantite }})</td>
+        <td class="num">- {{ l.montant_remise|format_money_with_currency }}</td></tr>
       {% endif %}
       {% endfor %}
     </tbody>
     <tfoot>
       {% if facture.montant_remise %}
-      <tr><td colspan="3">Total remises</td><td class="num">- {{ facture.montant_remise|floatformat:0 }}</td></tr>
+      <tr><td colspan="3">Total remises</td><td class="num">- {{ facture.montant_remise|format_money_with_currency }}</td></tr>
       {% endif %}
-      <tr class="total-row"><td colspan="3">TOTAL</td><td class="num">{{ facture.montant_total|floatformat:0 }}</td></tr>
+      <tr class="total-row"><td colspan="3">TOTAL</td><td class="num">{{ facture.montant_total|format_money_with_currency }}</td></tr>
     </tfoot>
   </table>
 
@@ -64,7 +65,7 @@
   <div>
     Payé comptant
     {% with p=facture.paiements.first %}{% if p %}({{ p.get_mode_display }}){% endif %}{% endwith %}
-    — {{ facture.montant_total|floatformat:0 }} FCFA
+    — {{ facture.montant_total|format_money_with_currency }} FCFA
   </div>
 
   <div class="pied">

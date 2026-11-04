@@ -1,3 +1,4 @@
+{% load monnaie %}
 {% load static %}
 <!DOCTYPE html>
 <html lang="fr">
@@ -94,15 +95,15 @@
       {% for l in calcul.lignes %}
       <tr>
         <td>{{ l.article.libarticle }}</td><td>{{ l.conditionnement.nom }}</td>
-        <td class="num">{{ l.prix_unitaire|floatformat:0 }}</td>
-        <td class="num">{{ l.remise_unitaire|floatformat:0 }}</td>
-        <td class="num">{{ l.prix_net|floatformat:0 }}</td>
+        <td class="num">{{ l.prix_unitaire|format_money_with_currency }}</td>
+        <td class="num">{{ l.remise_unitaire|format_money_with_currency }}</td>
+        <td class="num">{{ l.prix_net|format_money_with_currency }}</td>
         <td class="num">{{ l.quantite_facturee }}</td>
         <td class="num">{{ l.quantite_vendue }}</td>
-        <td class="num">{{ l.montant_vendu|floatformat:0 }}</td>
+        <td class="num">{{ l.montant_vendu|format_money_with_currency }}</td>
         <td class="num retour">{{ l.quantite_retournee }}</td>
         <td class="num retour">+{{ l.unites_retournees }}</td>
-        <td class="num retour">{{ l.montant_retourne|floatformat:0 }}</td>
+        <td class="num retour">{{ l.montant_retourne|format_money_with_currency }}</td>
       </tr>
       {% endfor %}
     </tbody>
@@ -111,10 +112,10 @@
         <td colspan="5" class="num">TOTAUX</td>
         <td class="num">{{ calcul.quantite_facturee_totale }}</td>
         <td class="num">{{ calcul.quantite_vendue_totale }}</td>
-        <td class="num">{{ calcul.montant_vendu_ht|floatformat:0 }}</td>
+        <td class="num">{{ calcul.montant_vendu_ht|format_money_with_currency }}</td>
         <td class="num retour">{{ calcul.quantite_retournee_totale }}</td>
         <td class="num retour">+{{ calcul.unites_retournees_totales }}</td>
-        <td class="num retour">{{ calcul.montant_retourne_ht|floatformat:0 }}</td>
+        <td class="num retour">{{ calcul.montant_retourne_ht|format_money_with_currency }}</td>
       </tr>
     </tfoot>
   </table>
@@ -124,18 +125,18 @@
       <h3>Marchandise reprise</h3>
       <div class="ligne"><span>Conditionnements</span><span>{% for d in calcul.decompte_retourne %}{{ d.conditionnement.nom }} : <strong>{{ d.quantite }}</strong>{% if not forloop.last %}, {% endif %}{% empty %}—{% endfor %}</span></div>
       <div class="ligne"><span>Unités réintégrées en stock</span><strong>{{ calcul.unites_retournees_totales }}</strong></div>
-      <div class="ligne"><span>Valeur HT</span><strong>{{ calcul.montant_retourne_ht|floatformat:0 }}</strong></div>
-      {% if facture.appliquer_tva %}<div class="ligne"><span>TVA (18%)</span><strong>{{ calcul.montant_retourne_tva|floatformat:0 }}</strong></div>{% endif %}
-      <div class="ligne net retour"><span>Total déduit</span><span>- {{ calcul.montant_retourne_ttc|floatformat:0 }} FCFA</span></div>
+      <div class="ligne"><span>Valeur HT</span><strong>{{ calcul.montant_retourne_ht|format_money_with_currency }}</strong></div>
+      {% if facture.appliquer_tva %}<div class="ligne"><span>TVA (18%)</span><strong>{{ calcul.montant_retourne_tva|format_money_with_currency }}</strong></div>{% endif %}
+      <div class="ligne net retour"><span>Total déduit</span><span>- {{ calcul.montant_retourne_ttc|format_money_with_currency }} FCFA</span></div>
     </div>
     <div class="col">
       <h3>Montant dû (quantités vendues)</h3>
-      <div class="ligne"><span>Montant HT facturé à la sortie</span><strong>{{ calcul.montant_facture_ht|floatformat:0 }}</strong></div>
-      <div class="ligne"><span>Montant HT vendu</span><strong>{{ calcul.montant_vendu_ht|floatformat:0 }}</strong></div>
-      {% if facture.appliquer_tva %}<div class="ligne"><span>TVA (18%)</span><strong>{{ calcul.montant_vendu_tva|floatformat:0 }}</strong></div>{% endif %}
-      <div class="ligne net"><span>NET À PAYER</span><span>{{ calcul.montant_vendu_ttc|floatformat:0 }} FCFA</span></div>
-      <div class="ligne"><span>Déjà payé</span><strong>{{ calcul.deja_paye|floatformat:0 }}</strong></div>
-      <div class="ligne retour"><span>Reste à payer</span><strong>{{ calcul.reste_a_payer|floatformat:0 }}</strong></div>
+      <div class="ligne"><span>Montant HT facturé à la sortie</span><strong>{{ calcul.montant_facture_ht|format_money_with_currency }}</strong></div>
+      <div class="ligne"><span>Montant HT vendu</span><strong>{{ calcul.montant_vendu_ht|format_money_with_currency }}</strong></div>
+      {% if facture.appliquer_tva %}<div class="ligne"><span>TVA (18%)</span><strong>{{ calcul.montant_vendu_tva|format_money_with_currency }}</strong></div>{% endif %}
+      <div class="ligne net"><span>NET À PAYER</span><span>{{ calcul.montant_vendu_ttc|format_money_with_currency }} FCFA</span></div>
+      <div class="ligne"><span>Déjà payé</span><strong>{{ calcul.deja_paye|format_money_with_currency }}</strong></div>
+      <div class="ligne retour"><span>Reste à payer</span><strong>{{ calcul.reste_a_payer|format_money_with_currency }}</strong></div>
       <div class="lettres">Arrêtée à la somme de : {{ retour.montant_en_lettres }}.</div>
     </div>
   </div>

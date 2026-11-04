@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load monnaie %}
 {% block title %}{{ liste.nomtarif }}{% endblock %}
 {% block page_title %}Liste de tarifs{% endblock %}
 
@@ -56,7 +57,7 @@
             <tr>
               <td>{{ t.article.libarticle }}</td>
               <td>{{ t.conditionnement.nom }}</td>
-              <td class="num">{{ t.prix_unitaire|floatformat:0 }}</td>
+              <td class="num">{{ t.prix_unitaire|format_money_with_currency }}</td>
               {% if peut_gerer_tarifs %}
               <td class="text-end">
                 <a href="{% url 'catalogue:tarif_modifier' t.pk %}" class="btn btn-sm btn-outline-primary">

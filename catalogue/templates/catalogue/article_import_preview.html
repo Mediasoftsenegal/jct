@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load monnaie %}
 {% block title %}Aperçu de l'import{% endblock %}
 {% block page_title %}Aperçu avant mise à niveau du catalogue{% endblock %}
 {% block topbar_actions %}
@@ -75,7 +76,7 @@
           </td>
           <td class="small">
             {% if r.tarif %}{{ r.tarif.conditionnement }} ({{ r.tarif.nombre_unites }}) :
-              <strong>{{ r.tarif.prix|floatformat:0 }}</strong><br>
+              <strong>{{ r.tarif.prix|format_money_with_currency }}</strong><br>
               <span class="text-muted-2">{{ r.tarif.liste_tarif }}</span>
             {% else %}<span class="text-muted-2">—</span>{% endif %}
           </td>

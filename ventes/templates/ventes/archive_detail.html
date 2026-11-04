@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load monnaie %}
 {% block title %}{{ commande.reference }}{% endblock %}
 {% block page_title %}Commande archivée {{ commande.reference }}{% endblock %}
 {% block topbar_actions %}<a href="{% url 'ventes:archive_liste' %}" class="btn btn-sm btn-outline-secondary">← Retour aux archives</a>{% endblock %}
@@ -17,8 +18,8 @@
         <dl class="row mb-0 small">
           <dt class="col-5 text-muted-2">Client</dt><dd class="col-7">{{ commande.client.nom|default:"—" }}</dd>
           <dt class="col-5 text-muted-2">Date</dt><dd class="col-7">{{ commande.date|date:"d/m/Y"|default:"—" }}</dd>
-          <dt class="col-5 text-muted-2">Montant</dt><dd class="col-7">{{ commande.montant|floatformat:0 }}</dd>
-          <dt class="col-5 text-muted-2">Montant emballage</dt><dd class="col-7">{{ commande.montant_emballage|floatformat:0 }}</dd>
+          <dt class="col-5 text-muted-2">Montant</dt><dd class="col-7">{{ commande.montant|format_money_with_currency }}</dd>
+          <dt class="col-5 text-muted-2">Montant emballage</dt><dd class="col-7">{{ commande.montant_emballage|format_money_with_currency }}</dd>
           <dt class="col-5 text-muted-2">TVA</dt><dd class="col-7">{{ commande.taux_tva|floatformat:0 }} %</dd>
           <dt class="col-5 text-muted-2">Mode de règlement</dt><dd class="col-7">{{ commande.mode_reglement|default:"—" }}</dd>
           {% if commande.numero_cheque %}<dt class="col-5 text-muted-2">N° chèque</dt><dd class="col-7">{{ commande.numero_cheque }}</dd>{% endif %}
@@ -42,9 +43,9 @@
               <td>{{ l.article.libarticle|default:"—" }}</td>
               <td>{{ l.conditionnement|default:"—" }}</td>
               <td class="num">{{ l.quantite|floatformat:0 }}</td>
-              <td class="num">{{ l.prix_liquide|floatformat:0 }}</td>
-              <td class="num">{{ l.prix_emballage|floatformat:0 }}</td>
-              <td class="num">{{ l.remise|floatformat:0 }}</td>
+              <td class="num">{{ l.prix_liquide|format_money_with_currency }}</td>
+              <td class="num">{{ l.prix_emballage|format_money_with_currency }}</td>
+              <td class="num">{{ l.remise|format_money_with_currency }}</td>
             </tr>
             {% empty %}<tr><td colspan="6" class="text-center text-muted-2 py-4">Aucune ligne.</td></tr>
             {% endfor %}

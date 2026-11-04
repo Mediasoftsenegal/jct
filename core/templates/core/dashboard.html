@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load monnaie %}
 {% block title %}Tableau de bord{% endblock %}
 {% block page_title %}Tableau de bord{% endblock %}
 {% block topbar_actions %}
@@ -9,12 +10,12 @@
 <div class="row g-3 mb-3">
   <div class="col-6 col-lg-3"><div class="kpi">
     <div class="label">Chiffre d'affaires du jour</div>
-    <div class="value">{{ ca_jour|floatformat:0 }}</div>
-    <div class="sub">{{ nb_factures_jour }} facture{{ nb_factures_jour|pluralize }} · encaissé {{ encaisse_jour|floatformat:0 }}</div>
+    <div class="value">{{ ca_jour|format_money_with_currency }}</div>
+    <div class="sub">{{ nb_factures_jour }} facture{{ nb_factures_jour|pluralize }} · encaissé {{ encaisse_jour|format_money_with_currency }}</div>
   </div></div>
   <div class="col-6 col-lg-3"><div class="kpi olive">
     <div class="label">CA du mois</div>
-    <div class="value">{{ ca_mois|floatformat:0 }}</div>
+    <div class="value">{{ ca_mois|format_money_with_currency }}</div>
     <div class="sub">Depuis le 1er du mois</div>
   </div></div>
   <div class="col-6 col-lg-3"><div class="kpi terra">
@@ -64,7 +65,7 @@
           <tbody>
             {% for f in dernieres_factures %}
             <tr><td><a href="{% url 'ventes:facture_detail' f.pk %}" class="text-decoration-none fw-semibold">{{ f.numero }}</a></td>
-              <td>{{ f.client.nom }}</td><td class="num">{{ f.montant_total|floatformat:0 }}</td>
+              <td>{{ f.client.nom }}</td><td class="num">{{ f.montant_total|format_money_with_currency }}</td>
               <td>{% if f.annulee %}<span class="badge-soft badge-danger">Annulée</span>
                   {% elif f.statut_paiement.value == 'PAYEE' %}<span class="badge-soft badge-ok">Payée</span>
                   {% elif f.statut_paiement.value == 'PARTIELLE' %}<span class="badge-soft badge-attente">Partielle</span>

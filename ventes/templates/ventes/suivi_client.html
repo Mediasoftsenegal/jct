@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load monnaie %}
 {% block title %}Suivi client{% endblock %}
 {% block page_title %}État de suivi client{% endblock %}
 
@@ -29,9 +30,9 @@
 </div>
 
 <div class="row g-3 mb-3">
-  <div class="col-md-4"><div class="kpi"><div class="label">Total facturé</div><div class="value">{{ rapport.total_facture|floatformat:0 }}</div><div class="sub">FCFA</div></div></div>
-  <div class="col-md-4"><div class="kpi olive"><div class="label">Total payé</div><div class="value">{{ rapport.total_paye|floatformat:0 }}</div><div class="sub">FCFA</div></div></div>
-  <div class="col-md-4"><div class="kpi terra"><div class="label">Reste à payer</div><div class="value">{{ rapport.total_non_paye|floatformat:0 }}</div><div class="sub">FCFA</div></div></div>
+  <div class="col-md-4"><div class="kpi"><div class="label">Total facturé</div><div class="value">{{ rapport.total_facture|format_money_with_currency }}</div><div class="sub">FCFA</div></div></div>
+  <div class="col-md-4"><div class="kpi olive"><div class="label">Total payé</div><div class="value">{{ rapport.total_paye|format_money_with_currency }}</div><div class="sub">FCFA</div></div></div>
+  <div class="col-md-4"><div class="kpi terra"><div class="label">Reste à payer</div><div class="value">{{ rapport.total_non_paye|format_money_with_currency }}</div><div class="sub">FCFA</div></div></div>
 </div>
 
 <div class="card">
@@ -48,9 +49,9 @@
         <tr class="{% if f.annulee %}text-muted-2{% endif %}">
           <td class="fw-semibold">{{ f.numero }}</td>
           <td>{{ f.date_facture|date:"d/m/Y" }}</td>
-          <td class="num">{{ f.montant|floatformat:0 }}</td>
-          <td class="num">{{ f.montant_paye|floatformat:0 }}</td>
-          <td class="num">{{ f.reliquat|floatformat:0 }}</td>
+          <td class="num">{{ f.montant|format_money_with_currency }}</td>
+          <td class="num">{{ f.montant_paye|format_money_with_currency }}</td>
+          <td class="num">{{ f.reliquat|format_money_with_currency }}</td>
           <td>{% if f.annulee %}<span class="badge-soft badge-danger">Annulée</span>
               {% else %}<span class="badge-soft badge-neutre">{{ f.statut_paiement }}</span>{% endif %}</td>
           <td>{{ f.dernier_paiement|date:"d/m/Y"|default:"—" }}</td>

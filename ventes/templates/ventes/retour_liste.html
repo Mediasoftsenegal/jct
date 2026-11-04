@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load monnaie %}
 {% block title %}Retours dépôt-vente{% endblock %}
 {% block page_title %}Retours dépôt-vente{% endblock %}
 
@@ -40,7 +41,7 @@
           <td class="num">{{ r.quantite_facturee_totale }}</td>
           <td class="num">{{ r.quantite_vendue_totale }}</td>
           <td class="num" style="color:var(--terracotta)">{{ r.quantite_retournee_totale }}</td>
-          <td class="num fw-semibold">{{ r.montant_vendu_ttc|floatformat:0 }}</td>
+          <td class="num fw-semibold">{{ r.montant_vendu_ttc|format_money_with_currency }}</td>
           <td>{% if r.statut == 'VALIDEE' %}<span class="badge-soft badge-ok">Validée</span>
               {% else %}<span class="badge-soft badge-attente">En saisie</span>{% endif %}</td>
           <td class="text-end"><a href="{% url 'ventes:retour_calcul' r.pk %}" target="_blank"

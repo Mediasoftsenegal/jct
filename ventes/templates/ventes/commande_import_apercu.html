@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load monnaie %}
 {% block title %}Aperçu de l'import{% endblock %}
 {% block page_title %}Aperçu avant import des commandes{% endblock %}
 {% block topbar_actions %}
@@ -42,7 +43,7 @@
                 {% if l.erreurs %}<span style="color:var(--terracotta)"> — {{ l.erreurs|join:" ; " }}</span>{% endif %}</div>
             {% endfor %}
           </td>
-          <td class="num">{{ b.montant_ht|floatformat:0 }}</td>
+          <td class="num">{{ b.montant_ht|format_money_with_currency }}</td>
           <td>
             {% if b.action == 'creation' %}<span class="badge-soft badge-ok">Création</span>
             {% else %}<span class="badge-soft badge-danger">Erreur</span>{% endif %}

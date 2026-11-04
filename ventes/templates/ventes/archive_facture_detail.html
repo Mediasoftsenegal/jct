@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load monnaie %}
 {% block title %}{{ facture.reference }}{% endblock %}
 {% block page_title %}Facture archivée {{ facture.reference }}{% endblock %}
 {% block topbar_actions %}<a href="{% url 'ventes:archive_facture_liste' %}" class="btn btn-sm btn-outline-secondary">← Retour aux archives</a>{% endblock %}
@@ -18,11 +19,11 @@
           <dt class="col-5 text-muted-2">Client</dt><dd class="col-7">{{ facture.client.nom|default:facture.nom_client|default:"—" }}</dd>
           <dt class="col-5 text-muted-2">Date</dt><dd class="col-7">{{ facture.date|date:"d/m/Y"|default:"—" }}</dd>
           {% if facture.commande_ancien_id %}<dt class="col-5 text-muted-2">N° commande (hist.)</dt><dd class="col-7">{{ facture.commande_ancien_id }}</dd>{% endif %}
-          <dt class="col-5 text-muted-2">Montant</dt><dd class="col-7">{{ facture.montant|floatformat:0 }}</dd>
-          <dt class="col-5 text-muted-2">Montant liquide</dt><dd class="col-7">{{ facture.montant_liquide|floatformat:0 }}</dd>
-          <dt class="col-5 text-muted-2">Montant emballage</dt><dd class="col-7">{{ facture.montant_emballage|floatformat:0 }}</dd>
+          <dt class="col-5 text-muted-2">Montant</dt><dd class="col-7">{{ facture.montant|format_money_with_currency }}</dd>
+          <dt class="col-5 text-muted-2">Montant liquide</dt><dd class="col-7">{{ facture.montant_liquide|format_money_with_currency }}</dd>
+          <dt class="col-5 text-muted-2">Montant emballage</dt><dd class="col-7">{{ facture.montant_emballage|format_money_with_currency }}</dd>
           <dt class="col-5 text-muted-2">Mode de règlement</dt><dd class="col-7">{{ facture.mode_reglement|default:"—" }}</dd>
-          <dt class="col-5 text-muted-2">Montant réglé</dt><dd class="col-7">{{ facture.montant_regle|floatformat:0 }}</dd>
+          <dt class="col-5 text-muted-2">Montant réglé</dt><dd class="col-7">{{ facture.montant_regle|format_money_with_currency }}</dd>
           <dt class="col-5 text-muted-2">Date de règlement</dt><dd class="col-7">{{ facture.date_reglement|date:"d/m/Y"|default:"—" }}</dd>
           {% if facture.retour_casier %}<dt class="col-5 text-muted-2">Retour casier</dt><dd class="col-7">{{ facture.retour_casier|floatformat:0 }}</dd>{% endif %}
           {% if facture.observations %}<dt class="col-5 text-muted-2">Observations</dt><dd class="col-7">{{ facture.observations }}</dd>{% endif %}
@@ -43,9 +44,9 @@
               <td>{{ l.article.libarticle|default:"—" }}</td>
               <td>{{ l.conditionnement|default:"—" }}</td>
               <td class="num">{{ l.quantite|floatformat:0 }}</td>
-              <td class="num">{{ l.prix_liquide|floatformat:0 }}</td>
-              <td class="num">{{ l.prix_emballage|floatformat:0 }}</td>
-              <td class="num">{{ l.remise|floatformat:0 }}</td>
+              <td class="num">{{ l.prix_liquide|format_money_with_currency }}</td>
+              <td class="num">{{ l.prix_emballage|format_money_with_currency }}</td>
+              <td class="num">{{ l.remise|format_money_with_currency }}</td>
             </tr>
             {% empty %}<tr><td colspan="6" class="text-center text-muted-2 py-4">Aucune ligne.</td></tr>
             {% endfor %}

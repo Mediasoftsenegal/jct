@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load monnaie %}
 {% block title %}Articles{% endblock %}
 {% block page_title %}Articles{% endblock %}
 
@@ -64,7 +65,7 @@
           <td class="num {% if l.sous_seuil %}fw-bold{% endif %}" {% if l.sous_seuil %}style="color:var(--danger)"{% endif %}>
               {{ l.stock }} {{ l.a.unite_base }}</td>
           <td class="num text-muted-2">{{ l.a.seuil_alerte }}</td>
-          <td class="num">{{ l.a.prix_achat|floatformat:0 }}</td>
+          <td class="num">{{ l.a.prix_achat|format_money_with_currency }}</td>
           <td class="text-end">
             {% if l.sous_seuil %}<span class="badge-soft badge-attente">sous seuil</span>{% endif %}
           </td>
