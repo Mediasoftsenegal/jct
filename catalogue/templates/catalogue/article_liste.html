@@ -33,6 +33,10 @@
   </div>
 </div>
 
+<form method="post" action="{% url 'catalogue:article_modification_groupee' %}" id="form-groupee">
+{% csrf_token %}
+<input type="hidden" name="q" value="{{ q }}">
+<input type="hidden" name="type" value="{{ type_sel }}">
 <div class="card">
   <div class="card-header d-flex justify-content-between align-items-center">
     <span>Catalogue</span>
@@ -41,12 +45,14 @@
   <div class="table-responsive">
     <table class="table table-hover">
       <thead>
-        <tr><th>Code</th><th>Désignation</th><th>Type</th>
+        <tr><th style="width:2.5rem"><input type="checkbox" class="form-check-input" id="tout-cocher" aria-label="Tout sélectionner"></th>
+            <th>Code</th><th>Désignation</th><th>Type</th>
             <th class="num">Stock</th><th class="num">Seuil</th><th class="num">Prix d'achat</th><th></th></tr>
       </thead>
       <tbody>
         {% for l in lignes %}
         <tr>
+          <td><input type="checkbox" class="form-check-input ligne-article" name="ids" value="{{ l.a.pk }}" aria-label="Sélectionner {{ l.a.libarticle }}"></td>
           <td class="text-muted-2">{{ l.a.code }}</td>
           <td>
             <a href="{% url 'catalogue:article_detail' l.a.pk %}" class="fw-semibold text-decoration-none">
@@ -64,12 +70,42 @@
           </td>
         </tr>
         {% empty %}
-        <tr><td colspan="7" class="text-center text-muted-2 py-4">Aucun article.</td></tr>
+        <tr><td colspan="8" class="text-center text-muted-2 py-4">Aucun article.</td></tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
+  <div class="card-footer">
+    <div class="row g-2 align-items-end">
+      <div class="col-md-2"><label class="form-label mb-1">Catégorie</label>
+        <select name="categorie_articles" class="form-select form-select-sm">
+          <option value="">— ne pas modifier —</option>
+          {% for c in categories %}<option value="{{ c.pk }}">{{ c.categories_articles }}</option>{% endfor %}
+        </select></div>
+      <div class="col-md-2"><label class="form-label mb-1">Type</label>
+        <select name="type_article" class="form-select form-select-sm">
+          <option value="">— ne pas modifier —</option>
+          {% for t in types %}<option value="{{ t.pk }}">{{ t.nom }}</option>{% endfor %}
+        </select></div>
+      <div class="col-md-2"><label class="form-label mb-1">Fournisseur</label>
+        <select name="fournisseur" class="form-select form-select-sm">
+          <option value="">— ne pas modifier —</option>
+          {% for f in fournisseurs %}<option value="{{ f.pk }}">{{ f }}</option>{% endfor %}
+        </select></div>
+      <div class="col-md-2"><label class="form-label mb-1">Prix d'achat liquide</label>
+        <input type="number" step="0.01" min="0" name="prix_achat_liquide" class="form-control form-control-sm" placeholder="inchangé"></div>
+      <div class="col-md-2"><label class="form-label mb-1">Prix d'achat emballage</label>
+        <input type="number" step="0.01" min="0" name="prix_achat_emballage" class="form-control form-control-sm" placeholder="inchangé"></div>
+      <div class="col-md-2"><label class="form-label mb-1">Prix de vente / bouteille</label>
+        <input type="number" step="0.01" min="0" name="prix_bouteille" class="form-control form-control-sm" placeholder="inchangé"></div>
+      <div class="col-12 d-flex align-items-center gap-2">
+        <button class="btn btn-sm btn-primary" id="bouton-groupe" disabled><i class="bi bi-pencil-square"></i> Appliquer à la sélection</button>
+        <span class="text-muted-2 small" id="nb-selection">0 article sélectionné</span>
+      </div>
+    </div>
+  </div>
 </div>
+</form>
 
 {% if page_obj.paginator.num_pages > 1 %}
 <div class="card-footer">
@@ -106,4 +142,27 @@
   </nav>
 </div>
 {% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+  var tout = document.getElementById('tout-cocher');
+  var lignes = document.querySelectorAll('.ligne-article');
+  var bouton = document.getElementById('bouton-groupe');
+  var compteur = document.getElementById('nb-selection');
+  function actualiser() {
+    var n = document.querySelectorAll('.ligne-article:checked').length;
+    bouton.disabled = n === 0;
+    compteur.textContent = n + ' article' + (n > 1 ? 's' : '') + ' sélectionné' + (n > 1 ? 's' : '');
+    tout.checked = n > 0 && n === lignes.length;
+  }
+  tout.addEventListener('change', function () {
+    lignes.forEach(function (c) { c.checked = tout.checked; });
+    actualiser();
+  });
+  lignes.forEach(function (c) { c.addEventListener('change', actualiser); });
+  actualiser();
+})();
+</script>
 {% endblock %}

@@ -1,4 +1,5 @@
 from decimal import Decimal
+from urllib.parse import urlencode
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
@@ -7,13 +8,16 @@ from django.core.paginator import Paginator
 from django.db.models import Q, Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
+from django.views.decorators.http import require_POST
 
 from clients.models import ListeTarif
 from core.utils import lire_xlsx
-from stock.models import MouvementStock
+from stock.models import Fournisseur, MouvementStock
 
 from . import services
-from .models import Article, Conditionnement, Tarif, TypeArticle
+from .forms import ModificationGroupeeForm
+from .models import Article, Conditionnement, Tarif, TypeArticle, categorie_article
 
 
 def _stock_map():
@@ -62,8 +66,33 @@ def article_liste(request):
         "q": q,
         "type_sel": type_id,
         "types": TypeArticle.objects.all(),
+        "categories": categorie_article.objects.all(),
+        "fournisseurs": Fournisseur.objects.all(),
     }
     return render(request, "catalogue/article_liste.html", context)
+
+
+@login_required
+@permission_required("catalogue.change_article", raise_exception=True)
+@require_POST
+def article_modification_groupee(request):
+    ids = [int(i) for i in request.POST.getlist("ids") if i.isdigit()]
+    filtres = urlencode({"q": request.POST.get("q", ""), "type": request.POST.get("type", "")})
+    retour = f"{reverse('catalogue:article_liste')}?{filtres}"
+    if not ids:
+        messages.error(request, "Sélectionnez au moins un article.")
+        return redirect(retour)
+    form = ModificationGroupeeForm(request.POST)
+    if not form.is_valid():
+        messages.error(request, "Valeur invalide : vérifiez les prix saisis.")
+        return redirect(retour)
+    champs = form.champs_a_modifier()
+    if not champs:
+        messages.error(request, "Choisissez au moins un champ à modifier.")
+        return redirect(retour)
+    modifies = Article.objects.filter(pk__in=ids).update(**champs)
+    messages.success(request, f"{modifies} article(s) modifié(s).")
+    return redirect(retour)
 
 
 @login_required

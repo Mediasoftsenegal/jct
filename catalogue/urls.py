@@ -6,6 +6,7 @@ app_name = "catalogue"
 
 urlpatterns = [
     path("articles/", views.article_liste, name="article_liste"),
+    path("articles/modifier-groupe/", views.article_modification_groupee, name="article_modification_groupee"),
     path("articles/importer/", views.article_import, name="article_import"),
     path("articles/importer/apercu/", views.article_import_preview, name="article_import_preview"),
     path("articles/<int:pk>/", views.article_detail, name="article_detail"),

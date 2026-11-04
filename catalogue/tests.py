@@ -70,3 +70,56 @@ class TarifModuleTests(TestCase):
         })
         self.assertEqual(r.status_code, 200)  # reste sur le formulaire
         self.assertFalse(Tarif.objects.filter(liste_tarif=self.liste, article=self.article).exists())
+
+
+class ModificationGroupeeArticlesTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user("gestionnaire", password="x")
+        self.user.user_permissions.set(Permission.objects.filter(codename="change_article"))
+        self.client.force_login(self.user)
+        from stock.models import Fournisseur
+        from .models import categorie_article
+        self.cat = categorie_article.objects.create(categories_articles="Boissons")
+        self.fourn = Fournisseur.objects.create(nom_fournisseur="Fournisseur test")
+        self.a1 = Article.objects.create(libarticle="Bissap 33cl", prix_achat=Decimal("500"))
+        self.a2 = Article.objects.create(libarticle="Gingembre 33cl", prix_achat=Decimal("400"))
+        self.a3 = Article.objects.create(libarticle="Hors sélection", prix_achat=Decimal("300"))
+        self.url = reverse("catalogue:article_modification_groupee")
+
+    def test_modifie_seulement_la_selection(self):
+        self.client.post(self.url, {"ids": [self.a1.pk, self.a2.pk], "categorie_articles": self.cat.pk,
+                                    "fournisseur": self.fourn.pk, "prix_bouteille": "1200"})
+        for a in (self.a1, self.a2):
+            a.refresh_from_db()
+            self.assertEqual(a.categorie_articles, self.cat)
+            self.assertEqual(a.fournisseur, self.fourn)
+            self.assertEqual(a.prix_bouteille, Decimal("1200"))
+        self.a3.refresh_from_db()
+        self.assertIsNone(self.a3.categorie_articles)
+
+    def test_champ_vide_ne_modifie_pas(self):
+        self.a1.prix_bouteille = Decimal("900")
+        self.a1.save()
+        self.client.post(self.url, {"ids": [self.a1.pk], "categorie_articles": self.cat.pk, "prix_bouteille": ""})
+        self.a1.refresh_from_db()
+        self.assertEqual(self.a1.prix_bouteille, Decimal("900"))
+        self.assertEqual(self.a1.categorie_articles, self.cat)
+
+    def test_sans_selection_ni_modification_rien_ne_change(self):
+        self.client.post(self.url, {"categorie_articles": self.cat.pk})
+        self.a1.refresh_from_db()
+        self.assertIsNone(self.a1.categorie_articles)
+        self.client.post(self.url, {"ids": [self.a1.pk]})
+        self.a1.refresh_from_db()
+        self.assertIsNone(self.a1.categorie_articles)
+
+    def test_prix_negatif_refuse(self):
+        self.client.post(self.url, {"ids": [self.a1.pk], "prix_bouteille": "-5"})
+        self.a1.refresh_from_db()
+        self.assertEqual(self.a1.prix_bouteille, Decimal("0"))
+
+    def test_sans_permission_refuse(self):
+        simple = User.objects.create_user("simple2", password="x")
+        self.client.force_login(simple)
+        r = self.client.post(self.url, {"ids": [self.a1.pk], "prix_bouteille": "10"})
+        self.assertEqual(r.status_code, 403)
