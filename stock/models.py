@@ -8,7 +8,7 @@ from core.models import TimeStampedModel
 from core.utils import PERIODES
 
 # Nom de la categorie d'article soumise a la T.B.A (SOBOA uniquement).
-CATEGORIE_ALCOOL_NOM = "BOISSON ALCOLISEE"
+CATEGORIE_ALCOOL_NOM = "BOISSONS ALCOLISEES"
 
 
 class TypeMouvement(models.TextChoices):
@@ -271,7 +271,7 @@ class LigneApprovisionnement(models.Model):
     @property
     def est_alcoolise(self):
         """Vrai si la ligne entre dans l'assiette de la T.B.A : fournisseur SOBOA
-        ET article de categorie 'BOISSON ALCOLISEE'."""
+        ET article de categorie 'BOISSONS ALCOLISEES'."""
         fournisseur = self.approvisionnement.fournisseur
         if not (fournisseur and fournisseur.nom_fournisseur == 'SOBOA'):
             return False
