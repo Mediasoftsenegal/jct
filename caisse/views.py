@@ -8,6 +8,62 @@ from django.views.decorators.http import require_POST
 
 from .models import Caisse
 
+# --------------------------------------------------------------------------- #
+#  Tri des tableaux factures / encaissements (clic sur l'en-tete de colonne,
+#  decroissant par defaut).
+# --------------------------------------------------------------------------- #
+CHAMPS_TRI_FACTURES = {"numero", "client", "montant", "reliquat"}
+CHAMPS_TRI_PAIEMENTS = {"facture", "type", "mode", "montant"}
+
+
+def _cle_tri_facture(f, champ):
+    return {
+        "numero": f.numero or "",
+        "client": f.client.nom if f.client_id else "",
+        "montant": f.montant_total,
+        "reliquat": f.reliquat,
+    }[champ]
+
+
+def _cle_tri_paiement(p, champ):
+    return {
+        "facture": p.facture.numero if p.facture_id else "",
+        "type": p.get_type_paiement_display(),
+        "mode": p.get_mode_display(),
+        "montant": p.montant,
+    }[champ]
+
+
+def _trier(request, items, prefixe, champs_valides, cle):
+    """Trie `items` (liste ou queryset) selon les parametres GET
+    `tri_<prefixe>` / `dir_<prefixe>`. Decroissant par montant par defaut."""
+    champ = request.GET.get(f"tri_{prefixe}", "montant")
+    if champ not in champs_valides:
+        champ = "montant"
+    decroissant = request.GET.get(f"dir_{prefixe}") != "asc"
+    items = sorted(items, key=lambda i: cle(i, champ), reverse=decroissant)
+    return items, champ, "desc" if decroissant else "asc"
+
+
+def _contexte_tableaux(request, jour, caisse_obj=None):
+    """Factures et paiements du jour, tries, prets pour le template."""
+    from ventes.models import Facture, Paiement
+
+    factures = list(
+        Facture.objects.filter(date__date=jour, annulee=False).select_related("client")
+    )
+    paiements = list(Paiement.objects.filter(date__date=jour).select_related("facture"))
+
+    factures, tri_f, dir_f = _trier(request, factures, "f", CHAMPS_TRI_FACTURES, _cle_tri_facture)
+    paiements, tri_p, dir_p = _trier(request, paiements, "p", CHAMPS_TRI_PAIEMENTS, _cle_tri_paiement)
+
+    return {
+        "factures": factures,
+        "paiements": paiements,
+        "tri_f": tri_f, "dir_f": dir_f,
+        "tri_p": tri_p, "dir_p": dir_p,
+    }
+
 
 @login_required
 def liste(request):
@@ -41,16 +97,11 @@ def voir(request):
     if not caisse:
         caisse = Caisse(**Caisse.calculer(jour))
 
-    from ventes.models import Facture, Paiement
-
-    factures = Facture.objects.filter(date__date=jour, annulee=False).select_related("client")
-    paiements = Paiement.objects.filter(date__date=jour).select_related("facture")
     contexte = {
         "actif": "caisse",
         "caisse": caisse,
-        "factures": factures,
-        "paiements": paiements,
         "peut_cloturer": request.user.has_perm("caisse.peut_cloturer_caisse"),
+        **_contexte_tableaux(request, jour),
     }
     return render(request, "caisse/detail.html", contexte)
 
@@ -81,15 +132,10 @@ def cloturer(request):
 @login_required
 def detail(request, pk):
     caisse = get_object_or_404(Caisse, pk=pk)
-    from ventes.models import Facture, Paiement
-
-    factures = Facture.objects.filter(date__date=caisse.date, annulee=False).select_related("client")
-    paiements = Paiement.objects.filter(date__date=caisse.date).select_related("facture")
     contexte = {
         "actif": "caisse",
         "caisse": caisse,
-        "factures": factures,
-        "paiements": paiements,
         "peut_cloturer": request.user.has_perm("caisse.peut_cloturer_caisse"),
+        **_contexte_tableaux(request, caisse.date),
     }
     return render(request, "caisse/detail.html", contexte)

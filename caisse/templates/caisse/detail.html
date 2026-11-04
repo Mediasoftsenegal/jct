@@ -24,16 +24,25 @@
 <div class="row g-3 mb-3">
   <div class="col-6 col-md-4"><div class="kpi"><div class="label">Facturé</div><div class="value">{{ caisse.total_facture|format_money_with_currency }}</div></div></div>
   <div class="col-6 col-md-4"><div class="kpi olive"><div class="label">Encaissé</div><div class="value">{{ caisse.total_encaisse|format_money_with_currency }}</div></div></div>
+  {% if caisse.est_en_surplus %}
+  <div class="col-6 col-md-4"><div class="kpi olive"><div class="label">Surplus encaissé</div><div class="value">{{ caisse.surplus_encaisse|format_money_with_currency }}</div></div></div>
+  {% else %}
   <div class="col-6 col-md-4"><div class="kpi terra"><div class="label">Non payé (jour)</div><div class="value">{{ caisse.total_non_paye|format_money_with_currency }}</div></div></div>
+  {% endif %}
 </div>
 
 <div class="row g-3">
   <div class="col-lg-6">
     <div class="card">
-      <div class="card-header">Factures du jour ({{ factures.count }})</div>
+      <div class="card-header">Factures du jour ({{ factures|length }})</div>
       <div class="table-responsive">
         <table class="table table-sm table-hover mb-0">
-          <thead><tr><th>N°</th><th>Client</th><th class="num">Montant</th><th class="num">Reliquat</th></tr></thead>
+          <thead><tr>
+            <th><a href="?{% if request.GET.date %}date={{ request.GET.date }}&{% endif %}tri_f=numero&dir_f={% if tri_f == 'numero' and dir_f == 'asc' %}desc{% else %}asc{% endif %}" class="text-decoration-none text-reset">N°{% if tri_f == 'numero' %} <i class="bi bi-caret-{% if dir_f == 'desc' %}down{% else %}up{% endif %}-fill small"></i>{% endif %}</a></th>
+            <th><a href="?{% if request.GET.date %}date={{ request.GET.date }}&{% endif %}tri_f=client&dir_f={% if tri_f == 'client' and dir_f == 'asc' %}desc{% else %}asc{% endif %}" class="text-decoration-none text-reset">Client{% if tri_f == 'client' %} <i class="bi bi-caret-{% if dir_f == 'desc' %}down{% else %}up{% endif %}-fill small"></i>{% endif %}</a></th>
+            <th class="num"><a href="?{% if request.GET.date %}date={{ request.GET.date }}&{% endif %}tri_f=montant&dir_f={% if tri_f == 'montant' and dir_f == 'desc' %}asc{% else %}desc{% endif %}" class="text-decoration-none text-reset">Montant{% if tri_f == 'montant' %} <i class="bi bi-caret-{% if dir_f == 'desc' %}down{% else %}up{% endif %}-fill small"></i>{% endif %}</a></th>
+            <th class="num"><a href="?{% if request.GET.date %}date={{ request.GET.date }}&{% endif %}tri_f=reliquat&dir_f={% if tri_f == 'reliquat' and dir_f == 'desc' %}asc{% else %}desc{% endif %}" class="text-decoration-none text-reset">Reliquat{% if tri_f == 'reliquat' %} <i class="bi bi-caret-{% if dir_f == 'desc' %}down{% else %}up{% endif %}-fill small"></i>{% endif %}</a></th>
+          </tr></thead>
           <tbody>
             {% for f in factures %}
             <tr><td><a href="{% url 'ventes:facture_detail' f.pk %}" class="text-decoration-none">{{ f.numero }}</a></td>
@@ -47,10 +56,15 @@
   </div>
   <div class="col-lg-6">
     <div class="card">
-      <div class="card-header">Encaissements du jour ({{ paiements.count }})</div>
+      <div class="card-header">Encaissements du jour ({{ paiements|length }})</div>
       <div class="table-responsive">
         <table class="table table-sm table-hover mb-0">
-          <thead><tr><th>Facture</th><th>Type</th><th>Mode</th><th class="num">Montant</th></tr></thead>
+          <thead><tr>
+            <th><a href="?{% if request.GET.date %}date={{ request.GET.date }}&{% endif %}tri_p=facture&dir_p={% if tri_p == 'facture' and dir_p == 'asc' %}desc{% else %}asc{% endif %}" class="text-decoration-none text-reset">Facture{% if tri_p == 'facture' %} <i class="bi bi-caret-{% if dir_p == 'desc' %}down{% else %}up{% endif %}-fill small"></i>{% endif %}</a></th>
+            <th><a href="?{% if request.GET.date %}date={{ request.GET.date }}&{% endif %}tri_p=type&dir_p={% if tri_p == 'type' and dir_p == 'asc' %}desc{% else %}asc{% endif %}" class="text-decoration-none text-reset">Type{% if tri_p == 'type' %} <i class="bi bi-caret-{% if dir_p == 'desc' %}down{% else %}up{% endif %}-fill small"></i>{% endif %}</a></th>
+            <th><a href="?{% if request.GET.date %}date={{ request.GET.date }}&{% endif %}tri_p=mode&dir_p={% if tri_p == 'mode' and dir_p == 'asc' %}desc{% else %}asc{% endif %}" class="text-decoration-none text-reset">Mode{% if tri_p == 'mode' %} <i class="bi bi-caret-{% if dir_p == 'desc' %}down{% else %}up{% endif %}-fill small"></i>{% endif %}</a></th>
+            <th class="num"><a href="?{% if request.GET.date %}date={{ request.GET.date }}&{% endif %}tri_p=montant&dir_p={% if tri_p == 'montant' and dir_p == 'desc' %}asc{% else %}desc{% endif %}" class="text-decoration-none text-reset">Montant{% if tri_p == 'montant' %} <i class="bi bi-caret-{% if dir_p == 'desc' %}down{% else %}up{% endif %}-fill small"></i>{% endif %}</a></th>
+          </tr></thead>
           <tbody>
             {% for p in paiements %}
             <tr><td>{{ p.facture.numero }}</td><td>{{ p.get_type_paiement_display }}</td>

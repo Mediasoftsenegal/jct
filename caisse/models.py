@@ -39,6 +39,20 @@ class Caisse(TimeStampedModel):
     def __str__(self):
         return f"Caisse du {self.date}"
 
+    # --- Encaisse vs facture : surplus ou reliquat du jour ---
+    @property
+    def est_en_surplus(self):
+        """Vrai si l'encaisse du jour depasse le facture du jour (le client a
+        regle plus qu'il n'a ete facture aujourd'hui, ex. reglement
+        d'anciennes factures)."""
+        return self.total_encaisse > self.total_facture
+
+    @property
+    def surplus_encaisse(self):
+        """Montant encaisse en plus du facture du jour (0 si pas de surplus)."""
+        ecart = self.total_encaisse - self.total_facture
+        return ecart if ecart > 0 else Decimal("0")
+
     @classmethod
     def calculer(cls, date=None):
         """Calcule les totaux de caisse d'une journee sans rien enregistrer
