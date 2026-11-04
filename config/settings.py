@@ -11,8 +11,8 @@ mimetypes.add_type("application/javascript", ".js", True)
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = config("SECRET_KEY", default="dev-insecure-key-a-changer")
-DEBUG = config("DEBUG", default=True, cast=bool)
-ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="127.0.0.1,localhost", cast=Csv())
+DEBUG = config("DEBUG", default=False, cast=bool)
+ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="127.0.0.1,saas.remacons.mywhc.ca,wwww.saas.remacons.mywhc.ca", cast=Csv())
 
 # --- Applications ---
 INSTALLED_APPS = [
@@ -73,6 +73,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "core.context_processors.droits_globaux",
             ],
         },
     },
@@ -84,12 +85,17 @@ WSGI_APPLICATION = "config.wsgi.application"
 # --- Base de donnees : bascule sqlite (dev) / mysql (production) ---
 DATABASES = {
     "default": {
-        "ENGINE": config("DB_ENGINE", default="django.db.backends.mysql"),
-        "NAME": config("DB_NAME", default="medstock"),
-        "USER": config("DB_USER", default="mde_kalaye"),
+        "ENGINE": config("DB_ENGINE", default="mysql.connector.django"),
+        "NAME": config("DB_NAME", default="remacons_gstock"),
+        "USER": config("DB_USER", default="remacons_gsapp"),
         "PASSWORD": config("DB_PASSWORD", default=""),
         "HOST": config("DB_HOST", default="localhost"),
         "PORT": config("DB_PORT", default="3306"),
+        'OPTIONS': {
+            'use_pure': True,
+            'time_zone': '+00:00',   # ← force la conversion datetime correcte
+            'charset': 'utf8mb4',
+        },
     }
 }
 
@@ -127,14 +133,20 @@ LANGUAGE_CODE = config("LANGUAGE_CODE", default="fr-fr")
 # des CONVERT_TZ(...) MySQL — inutilisables sur ce serveur car les tables de
 # fuseaux horaires (mysql.time_zone_name) n'y sont pas chargees, ce qui
 # faisait silencieusement echouer tout filtre par date (__date, __gte...).
-TIME_ZONE = "UTC"
+TIME_ZONE = 'Africa/Dakar'
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
 
+# --- Session : deconnexion automatique apres 25 min d'inactivite ---
+# SESSION_SAVE_EVERY_REQUEST prolonge l'expiration a chaque requete : le
+# delai court depuis la DERNIERE activite, pas depuis la connexion.
+SESSION_COOKIE_AGE = 25 * 60
+SESSION_SAVE_EVERY_REQUEST = True
+
 
 STATIC_URL = "/static/"
-STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
+STATICFILES_DIRS = [os.path.join(BASE_DIR , "static")]
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
 MEDIA_URL = "/media/"
