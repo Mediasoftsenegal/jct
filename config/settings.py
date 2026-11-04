@@ -133,7 +133,7 @@ LANGUAGE_CODE = config("LANGUAGE_CODE", default="fr-fr")
 # des CONVERT_TZ(...) MySQL — inutilisables sur ce serveur car les tables de
 # fuseaux horaires (mysql.time_zone_name) n'y sont pas chargees, ce qui
 # faisait silencieusement echouer tout filtre par date (__date, __gte...).
-TIME_ZONE = 'Africa/Dakar'
+TIME_ZONE = "UTC"
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
