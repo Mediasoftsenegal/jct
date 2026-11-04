@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load monnaie %}
 {% block title %}Caisse du {{ caisse.date|date:"d/m/Y" }}{% endblock %}
 {% block page_title %}Caisse du {{ caisse.date|date:"d/m/Y" }}{% endblock %}
 {% block topbar_actions %}<a href="{% url 'caisse:liste' %}" class="btn btn-sm btn-outline-secondary">← Retour</a>{% endblock %}
@@ -21,10 +22,9 @@
 {% endif %}
 
 <div class="row g-3 mb-3">
-  <div class="col-6 col-md-3"><div class="kpi"><div class="label">Facturé</div><div class="value">{{ caisse.total_facture|floatformat:0 }}</div></div></div>
-  <div class="col-6 col-md-3"><div class="kpi olive"><div class="label">Encaissé</div><div class="value">{{ caisse.total_encaisse|floatformat:0 }}</div></div></div>
-  <div class="col-6 col-md-3"><div class="kpi terra"><div class="label">Non payé (jour)</div><div class="value">{{ caisse.total_non_paye|floatformat:0 }}</div></div></div>
-  <div class="col-6 col-md-3"><div class="kpi alerte"><div class="label">Reliquat global</div><div class="value">{{ caisse.reliquat_global|floatformat:0 }}</div></div></div>
+  <div class="col-6 col-md-4"><div class="kpi"><div class="label">Facturé</div><div class="value">{{ caisse.total_facture|format_money_with_currency }}</div></div></div>
+  <div class="col-6 col-md-4"><div class="kpi olive"><div class="label">Encaissé</div><div class="value">{{ caisse.total_encaisse|format_money_with_currency }}</div></div></div>
+  <div class="col-6 col-md-4"><div class="kpi terra"><div class="label">Non payé (jour)</div><div class="value">{{ caisse.total_non_paye|format_money_with_currency }}</div></div></div>
 </div>
 
 <div class="row g-3">
@@ -37,7 +37,7 @@
           <tbody>
             {% for f in factures %}
             <tr><td><a href="{% url 'ventes:facture_detail' f.pk %}" class="text-decoration-none">{{ f.numero }}</a></td>
-              <td>{{ f.client.nom }}</td><td class="num">{{ f.montant_total|floatformat:0 }}</td><td class="num">{{ f.reliquat|floatformat:0 }}</td></tr>
+              <td>{{ f.client.nom }}</td><td class="num">{{ f.montant_total|format_money_with_currency }}</td><td class="num">{{ f.reliquat|format_money_with_currency }}</td></tr>
             {% empty %}<tr><td colspan="4" class="text-center text-muted-2 py-3">Aucune facture.</td></tr>
             {% endfor %}
           </tbody>
@@ -54,7 +54,7 @@
           <tbody>
             {% for p in paiements %}
             <tr><td>{{ p.facture.numero }}</td><td>{{ p.get_type_paiement_display }}</td>
-              <td>{{ p.get_mode_display }}</td><td class="num">{{ p.montant|floatformat:0 }}</td></tr>
+              <td>{{ p.get_mode_display }}</td><td class="num">{{ p.montant|format_money_with_currency }}</td></tr>
             {% empty %}<tr><td colspan="4" class="text-center text-muted-2 py-3">Aucun encaissement.</td></tr>
             {% endfor %}
           </tbody>

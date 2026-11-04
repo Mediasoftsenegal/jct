@@ -37,7 +37,6 @@ class Command(BaseCommand):
         self.stdout.write(
             self.style.SUCCESS(
                 f"Caisse du {caisse.date} : encaisse={caisse.total_encaisse}, "
-                f"facture={caisse.total_facture}, non paye={caisse.total_non_paye}, "
-                f"reliquat global={caisse.reliquat_global}."
+                f"facture={caisse.total_facture}, non paye={caisse.total_non_paye}."
             )
         )

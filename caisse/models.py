@@ -1,13 +1,10 @@
 from decimal import Decimal
 
-from django.core.cache import cache
 from django.db import models, transaction
 from django.db.models import Sum
 from django.utils import timezone
 
 from core.models import TimeStampedModel
-
-CLE_CACHE_RELIQUAT_GLOBAL = "caisse:reliquat_global"
 
 
 class Caisse(TimeStampedModel):
@@ -16,7 +13,12 @@ class Caisse(TimeStampedModel):
     - total_encaisse : argent effectivement recu ce jour (dates de paiement) ;
     - total_facture  : total facture ce jour (factures non annulees) ;
     - total_non_paye : reliquat des factures du jour ;
-    - reliquat_global: reliquat cumule sur toutes les factures ouvertes.
+    - reliquat_global: reliquat du jour (= total_non_paye). Le reliquat cumule
+      sur l'historique complet n'est plus calcule ici : avec la reprise de
+      l'ancien systeme (40 000+ factures) ce calcul etait trop lourd et ses
+      donnees pas encore fiabilisees. Un tableau dedie de reliquats
+      journaliers est prevu pour permettre une correction par rapport aux
+      imports de donnees ; ce champ sera revu a ce moment-la.
     """
 
     date = models.DateField(unique=True)
@@ -58,51 +60,16 @@ class Caisse(TimeStampedModel):
             s=Sum("montant")
         )["s"] or Decimal("0")
 
-        reliquat_global = cls._reliquat_global()
-
         return {
             "date": date,
             "total_facture": total_facture,
             "total_encaisse": total_encaisse,
             "total_non_paye": total_non_paye,
-            "reliquat_global": reliquat_global,
+            # Reliquat du jour tant que le tableau de reliquats journaliers
+            # (correction vs imports de donnees) n'existe pas encore.
+            "reliquat_global": total_non_paye,
             "nombre_factures": len(factures_jour),
         }
-
-    @staticmethod
-    def _reliquat_global(taille_lot=1000):
-        """Somme du reliquat de toutes les factures non annulees, par lots,
-        mise en cache (cf. `_calculer_reliquat_global`) : ce total ne depend
-        pas de la date consultee, pas la peine de le recalculer a chaque
-        affichage de la caisse."""
-        valeur = cache.get(CLE_CACHE_RELIQUAT_GLOBAL)
-        if valeur is None:
-            valeur = Caisse._calculer_reliquat_global(taille_lot)
-            cache.set(CLE_CACHE_RELIQUAT_GLOBAL, valeur, 300)  # 5 min
-        return valeur
-
-    @staticmethod
-    def _calculer_reliquat_global(taille_lot=1000):
-        """Calcul effectif (non mis en cache), par lots.
-
-        Avec plusieurs dizaines de milliers de factures (reprise de
-        l'ancien systeme), charger toute la table en une seule requete
-        prefetch_related genere des clauses IN(...) trop grandes pour
-        'range_optimizer_max_mem_size' sur ce serveur MySQL (erreur 3170).
-        On traite donc par lots d'ids, ce qui donne le meme resultat.
-        """
-        from ventes.models import Facture
-
-        total = Decimal("0")
-        ids = list(
-            Facture.objects.filter(annulee=False).order_by("pk").values_list("pk", flat=True)
-        )
-        for i in range(0, len(ids), taille_lot):
-            lot = Facture.objects.filter(pk__in=ids[i:i + taille_lot]).prefetch_related(
-                "lignes", "paiements"
-            )
-            total += sum((f.reliquat for f in lot), Decimal("0"))
-        return total
 
     @classmethod
     @transaction.atomic
