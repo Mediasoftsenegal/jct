@@ -51,6 +51,7 @@
   .totaux .item.reliquat { font-weight: 700; color: #b3261e; }
   .resume { margin-top: 8px; font-size: 8.5px; }
   .resume .lettres { font-style: italic; margin-top: 4px; color: #6b6153; }
+  .nb { margin-top: 10px; font-size: 6.5px; color: #6b6153; font-style: italic; }
   .pied { margin-top: 16px; font-size: 7.5px; color: #6b6153; text-align: center;
           border-top: 1px solid #e6ddc7; padding-top: 6px; }
   .annulee { color: #b3261e; font-weight: 700; border: 2px solid #b3261e;
@@ -169,6 +170,8 @@
   <div class="resume">
     <div class="lettres">Arrêtée à la somme de : {{ facture.montant_en_lettres }}.</div>
   </div>
+
+  <div class="nb">NB : Pour le paiement par chèque, le client doit rajouter 100 Frs au montant à payer indiqué sur la facture.</div>
 
   <div class="pied">
     Document généré le {{ now|date:"d/m/Y à H:i" }} · {{ parametrage.nom_entreprise }}{% if parametrage.slogan %} — {{ parametrage.slogan }}{% endif %}
